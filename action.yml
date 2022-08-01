@@ -1,25 +1,10 @@
-name: AKS Helm deploy
+name: Prepare AKS Helm deploy
 description: Deploy application service to AKS cluster
-inputs:      
-  ClientId:
-    description: Service principal client Id
-    required: true        
-  ClusterName:
-    description: AKS cluster name
-    required: true
-  ClusterResourceGroupName:
-    description: AKS cluster resource group name
-    required: true
+inputs:
   KubeloginVersion:
     description: Kubelogin version
     required: true
     default: "v0.0.13"
-  SubscriptionId:
-    description: Service principal subscription Id
-    required: true
-  TenantId:
-    description: Service principal tenant Id
-    required: true
 
 runs:
   using: "composite"
@@ -27,9 +12,9 @@ runs:
     - name: "Login with SPN"
       uses: azure/login@v1
       with:
-        client-id: ${{ inputs.ClientId }}
-        tenant-id: ${{ inputs.TenantId }}
-        subscription-id: ${{ inputs.SubscriptionId }} 
+        client-id: ${{ env.CLIENT_ID }}
+        tenant-id: ${{ env.TENANT_ID }}
+        subscription-id: ${{ env.SUBSCRIPTION_ID }} 
 
     - name: "Install kube-login tool"
       shell: bash
@@ -42,8 +27,8 @@ runs:
     - name: "Set K8s context"
       uses: Azure/aks-set-context@v2
       with:
-        resource-group: ${{ inputs.ClusterResourceGroupName }}
-        cluster-name: ${{ inputs.ClusterName }}
-        subscription: ${{ inputs.SubscriptionId }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP_NAME }}
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        subscription: ${{ env.SUBSCRIPTION_ID }}
         admin: "false"
         use-kubelogin: "true"
